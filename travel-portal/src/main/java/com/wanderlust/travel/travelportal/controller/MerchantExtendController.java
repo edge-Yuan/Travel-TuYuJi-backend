@@ -20,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/travel-portal/merchantExtend")
 @Slf4j
+//已修改
 public class MerchantExtendController {
     @Autowired
     private IMerchantExtendService merchantExtendService;
