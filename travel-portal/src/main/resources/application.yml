@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: 途遇纪旅游管理系统
+  profiles:
+    active: dev

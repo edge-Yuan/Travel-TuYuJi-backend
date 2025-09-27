@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wanderlust.travel.travelportal.mapper.OrderStatusLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wanderlust.travel.travelportal.entity.OrderStatusLog">
+        <id column="log_id" property="logId" />
+        <result column="order_id" property="orderId" />
+        <result column="from_status" property="fromStatus" />
+        <result column="to_status" property="toStatus" />
+        <result column="reason" property="reason" />
+        <result column="operator_id" property="operatorId" />
+        <result column="operator_type" property="operatorType" />
+        <result column="remark" property="remark" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        log_id, order_id, from_status, to_status, reason, operator_id, operator_type, remark, create_time, update_time
+    </sql>
+
+</mapper>
