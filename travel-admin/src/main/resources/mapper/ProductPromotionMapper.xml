@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wanderlust.travel.traveladmin.mapper.ProductPromotionMapper">
+
+    <!-- 分页查询优惠活动列表 -->
+    <select id="selectPromotionPage" resultType="com.wanderlust.travel.traveladmin.vo.PromotionVO">
+        SELECT 
+            pp.promotion_id,
+            pp.merchant_id,
+            pp.type,
+            pp.name,
+            pp.discount,
+            pp.min_amount,
+            pp.discount_amount,
+            pp.start_time,
+            pp.end_time,
+            pp.status,
+            pp.description,
+            pp.create_time,
+            pp.update_time,
+            COUNT(pr.product_id) as product_count
+        FROM product_promotion pp
+        LEFT JOIN promotion_product pr ON pp.promotion_id = pr.promotion_id
+        <where>
+            <if test="merchantId != null">
+                AND pp.merchant_id = #{merchantId}
+            </if>
+            <if test="status != null">
+                AND pp.status = #{status}
+            </if>
+        </where>
+        GROUP BY pp.promotion_id
+        ORDER BY pp.create_time DESC
+    </select>
+
+    <!-- 根据ID查询优惠活动详情 -->
+    <select id="selectPromotionDetail" resultType="com.wanderlust.travel.traveladmin.vo.PromotionVO">
+        SELECT 
+            pp.promotion_id,
+            pp.merchant_id,
+            pp.type,
+            pp.name,
+            pp.discount,
+            pp.min_amount,
+            pp.discount_amount,
+            pp.start_time,
+            pp.end_time,
+            pp.status,
+            pp.description,
+            pp.create_time,
+            pp.update_time,
+            COUNT(pr.product_id) as product_count
+        FROM product_promotion pp
+        LEFT JOIN promotion_product pr ON pp.promotion_id = pr.promotion_id
+        WHERE pp.promotion_id = #{promotionId}
+        GROUP BY pp.promotion_id
+    </select>
+
+    <!-- 查询商家的所有优惠活动 -->
+    <select id="selectPromotionsByMerchant" resultType="com.wanderlust.travel.traveladmin.vo.PromotionVO">
+        SELECT 
+            pp.promotion_id,
+            pp.merchant_id,
+            pp.type,
+            pp.name,
+            pp.discount,
+            pp.min_amount,
+            pp.discount_amount,
+            pp.start_time,
+            pp.end_time,
+            pp.status,
+            pp.description,
+            pp.create_time,
+            pp.update_time,
+            COUNT(pr.product_id) as product_count
+        FROM product_promotion pp
+        LEFT JOIN promotion_product pr ON pp.promotion_id = pr.promotion_id
+        WHERE pp.merchant_id = #{merchantId}
+        GROUP BY pp.promotion_id
+        ORDER BY pp.create_time DESC
+    </select>
+
+    <!-- 查询有效的优惠活动 -->
+    <select id="selectActivePromotions" resultType="com.wanderlust.travel.traveladmin.vo.PromotionVO">
+        SELECT 
+            pp.promotion_id,
+            pp.merchant_id,
+            pp.type,
+            pp.name,
+            pp.discount,
+            pp.min_amount,
+            pp.discount_amount,
+            pp.start_time,
+            pp.end_time,
+            pp.status,
+            pp.description,
+            pp.create_time,
+            pp.update_time,
+            COUNT(pr.product_id) as product_count
+        FROM product_promotion pp
+        LEFT JOIN promotion_product pr ON pp.promotion_id = pr.promotion_id
+        WHERE pp.merchant_id = #{merchantId}
+        AND pp.status = 1
+        AND pp.start_time &lt;= NOW()
+        AND pp.end_time &gt;= NOW()
+        GROUP BY pp.promotion_id
+        ORDER BY pp.create_time DESC
+    </select>
+
+</mapper>

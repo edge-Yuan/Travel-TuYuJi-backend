@@ -23,4 +23,6 @@ public class BuyProductsDetailVO {
     private Long merchantId;
     private String productSellingPoints;
     private String supplier;
+    private String features;
+    private String featuresImgs;
 }

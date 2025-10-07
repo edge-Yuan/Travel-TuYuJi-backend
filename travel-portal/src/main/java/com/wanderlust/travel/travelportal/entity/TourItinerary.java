@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -65,6 +67,51 @@ public class TourItinerary implements Serializable {
 
     @ApiModelProperty("行程照片")
     private String imgUrls;
+
+    @ApiModelProperty("用户ID")
+    private Long userId;
+
+    @ApiModelProperty("产品ID")
+    private Long productId;
+
+    @ApiModelProperty("订单状态：0-待确认，1-已确认，2-已完成，3-已取消，4-退款中")
+    private Byte orderStatus;
+
+    @ApiModelProperty("支付状态：0-待支付，1-已支付，2-已退款")
+    private Byte payStatus;
+
+    @ApiModelProperty("总价格")
+    private BigDecimal totalPrice;
+
+    @ApiModelProperty("出行人数")
+    private Integer travellers;
+
+    @ApiModelProperty("预订使用日期")
+    private LocalDate bookingDate;
+
+    @ApiModelProperty("特殊需求")
+    private String specialNeeds;
+
+    @ApiModelProperty("收货人姓名")
+    private String receiverName;
+
+    @ApiModelProperty("收货人电话")
+    private String receiverPhone;
+
+    @ApiModelProperty("收货地址")
+    private String receiverAddress;
+
+    @ApiModelProperty("创建时间")
+    private LocalDateTime createTime;
+
+    @ApiModelProperty("更新时间")
+    private LocalDateTime updateTime;
+
+    @ApiModelProperty("取消时间")
+    private LocalDateTime cancelTime;
+
+    @ApiModelProperty("支付方式：1-微信，2-支付宝")
+    private Byte payType;
 
     public Long getItineraryId() {
         return itineraryId;
@@ -176,6 +223,126 @@ public class TourItinerary implements Serializable {
 
     public void setImgUrls(String imgUrls) {
         this.imgUrls = imgUrls;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public Byte getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(Byte orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public Byte getPayStatus() {
+        return payStatus;
+    }
+
+    public void setPayStatus(Byte payStatus) {
+        this.payStatus = payStatus;
+    }
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public Integer getTravellers() {
+        return travellers;
+    }
+
+    public void setTravellers(Integer travellers) {
+        this.travellers = travellers;
+    }
+
+    public LocalDate getBookingDate() {
+        return bookingDate;
+    }
+
+    public void setBookingDate(LocalDate bookingDate) {
+        this.bookingDate = bookingDate;
+    }
+
+    public String getSpecialNeeds() {
+        return specialNeeds;
+    }
+
+    public void setSpecialNeeds(String specialNeeds) {
+        this.specialNeeds = specialNeeds;
+    }
+
+    public String getReceiverName() {
+        return receiverName;
+    }
+
+    public void setReceiverName(String receiverName) {
+        this.receiverName = receiverName;
+    }
+
+    public String getReceiverPhone() {
+        return receiverPhone;
+    }
+
+    public void setReceiverPhone(String receiverPhone) {
+        this.receiverPhone = receiverPhone;
+    }
+
+    public String getReceiverAddress() {
+        return receiverAddress;
+    }
+
+    public void setReceiverAddress(String receiverAddress) {
+        this.receiverAddress = receiverAddress;
+    }
+
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
+
+    public LocalDateTime getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(LocalDateTime updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public LocalDateTime getCancelTime() {
+        return cancelTime;
+    }
+
+    public void setCancelTime(LocalDateTime cancelTime) {
+        this.cancelTime = cancelTime;
+    }
+
+    public Byte getPayType() {
+        return payType;
+    }
+
+    public void setPayType(Byte payType) {
+        this.payType = payType;
     }
 
     @Override

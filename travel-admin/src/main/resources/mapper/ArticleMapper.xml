@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wanderlust.travel.traveladmin.mapper.ArticleMapper">
+
+    <!-- 分页查询文章列表（带搜索条件） -->
+    <select id="selectArticlePage" resultType="com.wanderlust.travel.traveladmin.entity.Article">
+        SELECT * FROM article
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (title LIKE CONCAT('%', #{keyword}, '%') 
+                     OR summary LIKE CONCAT('%', #{keyword}, '%')
+                     OR content LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="category != null and category != ''">
+                AND category = #{category}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="region != null and region != ''">
+                AND region = #{region}
+            </if>
+            <if test="featured != null">
+                AND featured = #{featured}
+            </if>
+        </where>
+        ORDER BY 
+        <choose>
+            <when test="status == 'published'">
+                publish_time DESC
+            </when>
+            <otherwise>
+                update_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 批量更新文章状态 -->
+    <update id="batchUpdateStatus">
+        UPDATE article SET status = #{status}, update_time = NOW()
+        <if test="status == 'published'">
+            , publish_time = NOW()
+        </if>
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 批量删除文章 -->
+    <delete id="batchDelete">
+        DELETE FROM article WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

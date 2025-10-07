@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wanderlust.travel.traveladmin.mapper.ServiceMapper">
+
+    <!-- 分页查询服务列表 -->
+    <select id="selectServicePage" resultType="com.wanderlust.travel.traveladmin.entity.ServiceManagement">
+        SELECT * FROM service_management
+        WHERE is_deleted = 0
+        <if test="searchDTO.serviceType != null and searchDTO.serviceType != ''">
+            AND service_type = #{searchDTO.serviceType}
+        </if>
+        <if test="searchDTO.status != null and searchDTO.status != ''">
+            AND status = #{searchDTO.status}
+        </if>
+        <if test="searchDTO.serviceDate != null">
+            AND DATE(service_time) = DATE(#{searchDTO.serviceDate})
+        </if>
+        <if test="searchDTO.keyword != null and searchDTO.keyword != ''">
+            AND (order_no LIKE CONCAT('%', #{searchDTO.keyword}, '%')
+                 OR customer_name LIKE CONCAT('%', #{searchDTO.keyword}, '%'))
+        </if>
+        <if test="searchDTO.customerName != null and searchDTO.customerName != ''">
+            AND customer_name LIKE CONCAT('%', #{searchDTO.customerName}, '%')
+        </if>
+        <if test="searchDTO.orderNo != null and searchDTO.orderNo != ''">
+            AND order_no LIKE CONCAT('%', #{searchDTO.orderNo}, '%')
+        </if>
+        <if test="searchDTO.staffName != null and searchDTO.staffName != ''">
+            AND staff_name LIKE CONCAT('%', #{searchDTO.staffName}, '%')
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 获取今日服务统计 -->
+    <select id="selectTodayStatistics" resultType="com.wanderlust.travel.traveladmin.vo.ServiceStatisticsVO">
+        SELECT 
+            (SELECT COUNT(*) FROM service_management WHERE service_type = 'hotel' AND DATE(service_time) = DATE(#{today}) AND is_deleted = 0) as hotelCheckins,
+            (SELECT COUNT(*) FROM service_management WHERE service_type = 'attraction' AND DATE(service_time) = DATE(#{today}) AND is_deleted = 0) as ticketEntries,
+            (SELECT COUNT(*) FROM service_management WHERE service_type = 'route' AND DATE(service_time) = DATE(#{today}) AND is_deleted = 0) as routeServices,
+            (SELECT COUNT(*) FROM service_exception WHERE DATE(exception_time) = DATE(#{today})) as exceptions,
+            (SELECT COUNT(*) FROM service_management WHERE status = 'pending' AND DATE(service_time) = DATE(#{today}) AND is_deleted = 0) as pendingServices,
+            (SELECT COUNT(*) FROM service_management WHERE status = 'in_progress' AND DATE(service_time) = DATE(#{today}) AND is_deleted = 0) as inProgressServices,
+            (SELECT COUNT(*) FROM service_management WHERE status = 'completed' AND DATE(service_time) = DATE(#{today}) AND is_deleted = 0) as completedServices,
+            (SELECT COUNT(*) FROM service_management WHERE status = 'exception' AND DATE(service_time) = DATE(#{today}) AND is_deleted = 0) as exceptionServices
+    </select>
+
+    <!-- 根据订单号查询服务 -->
+    <select id="selectByOrderNo" resultType="com.wanderlust.travel.traveladmin.entity.ServiceManagement">
+        SELECT * FROM service_management 
+        WHERE order_no = #{orderNo} AND is_deleted = 0
+    </select>
+
+    <!-- 根据服务类型统计数量 -->
+    <select id="countByServiceType" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM service_management 
+        WHERE service_type = #{serviceType} 
+        AND DATE(service_time) = DATE(#{today}) 
+        AND is_deleted = 0
+    </select>
+
+    <!-- 根据状态统计数量 -->
+    <select id="countByStatus" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM service_management 
+        WHERE status = #{status} 
+        AND DATE(service_time) = DATE(#{today}) 
+        AND is_deleted = 0
+    </select>
+
+    <!-- 获取服务人员列表 -->
+    <select id="selectStaffList" resultType="java.lang.String">
+        SELECT DISTINCT staff_name FROM service_management 
+        WHERE staff_name IS NOT NULL AND staff_name != '' AND is_deleted = 0
+        ORDER BY staff_name
+    </select>
+
+    <!-- 批量更新服务状态 -->
+    <update id="batchUpdateStatus">
+        UPDATE service_management 
+        SET status = #{status}, update_by = #{updateBy}, update_time = NOW()
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND is_deleted = 0
+    </update>
+
+</mapper>

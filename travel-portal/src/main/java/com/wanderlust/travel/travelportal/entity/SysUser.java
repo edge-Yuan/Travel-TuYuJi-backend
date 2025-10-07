@@ -41,6 +41,18 @@ public class SysUser implements Serializable {
     @ApiModelProperty("邮箱")
     private String email;
 
+  @ApiModelProperty("性别：male/female/other")
+  private String gender;
+
+  @ApiModelProperty("出生日期")
+  private java.time.LocalDate birthday;
+
+  @ApiModelProperty("个人简介")
+  private String bio;
+
+  @ApiModelProperty("所在地(逗号分隔)")
+  private String location;
+
     @ApiModelProperty("角色类型：1-游客，2-系统管理员，3-财务管理员，4-旅行商，5-导游")
     private int userRole;
 
@@ -101,6 +113,38 @@ public class SysUser implements Serializable {
         this.email = email;
     }
 
+  public String getGender() {
+      return gender;
+  }
+
+  public void setGender(String gender) {
+      this.gender = gender;
+  }
+
+  public java.time.LocalDate getBirthday() {
+      return birthday;
+  }
+
+  public void setBirthday(java.time.LocalDate birthday) {
+      this.birthday = birthday;
+  }
+
+  public String getBio() {
+      return bio;
+  }
+
+  public void setBio(String bio) {
+      this.bio = bio;
+  }
+
+  public String getLocation() {
+      return location;
+  }
+
+  public void setLocation(String location) {
+      this.location = location;
+  }
+
     public int getUserRole() {
         return userRole;
     }
@@ -142,6 +186,10 @@ public class SysUser implements Serializable {
             ", realName = " + realName +
             ", phone = " + phone +
             ", email = " + email +
+            ", gender = " + gender +
+            ", birthday = " + birthday +
+            ", bio = " + bio +
+            ", location = " + location +
             ", userRole = " + userRole +
             ", status = " + status +
             ", createTime = " + createTime +

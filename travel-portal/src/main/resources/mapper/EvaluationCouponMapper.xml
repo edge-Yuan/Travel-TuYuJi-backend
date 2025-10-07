@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wanderlust.travel.travelportal.mapper.EvaluationCouponMapper">
+
+    <!-- 根据评价ID和用户ID查询优惠券 -->
+    <select id="selectByEvalIdAndUserId" resultType="com.wanderlust.travel.travelportal.entity.EvaluationCoupon">
+        SELECT * FROM evaluation_coupon 
+        WHERE eval_id = #{evalId} AND user_id = #{userId}
+    </select>
+
+    <!-- 根据优惠券编码查询 -->
+    <select id="selectByCouponCode" resultType="com.wanderlust.travel.travelportal.entity.EvaluationCoupon">
+        SELECT * FROM evaluation_coupon 
+        WHERE coupon_code = #{couponCode}
+    </select>
+
+</mapper>

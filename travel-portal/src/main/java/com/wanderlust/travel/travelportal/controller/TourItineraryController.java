@@ -194,7 +194,7 @@ public class TourItineraryController {
             // 设置订单信息
             TourOrder tourOrder = tourOrderMap.get(itinerary.getOrderId());
             if (tourOrder != null) {
-                scanVO.setOrderAmount(tourOrder.getOrderAmount());
+                scanVO.setOrderAmount(tourOrder.getTotalPrice());
             }
 
             resultList.add(scanVO);
@@ -259,6 +259,27 @@ public class TourItineraryController {
     public Result<TourItinerary> getItineraryById(@PathVariable Long id) {
         TourItinerary itinerary = tourItineraryService.getById(id);
         return itinerary == null ? Result.error("行程不存在") : Result.success(itinerary);
+    }
+
+    /**
+     * 获取用户行程数量
+     */
+    @GetMapping("/travelRoute/user/{userId}/count")
+    public Result<Long> getUserItineraryCount(@PathVariable Long userId) {
+        try {
+            log.info("获取用户行程数量: userId={}", userId);
+            
+            // 先通过订单获取用户的行程数量
+            long count = tourItineraryService.lambdaQuery()
+                .eq(TourItinerary::getUserId, userId)
+                .count();
+            
+            log.info("用户 {} 的行程数量: {}", userId, count);
+            return Result.success(count);
+        } catch (Exception e) {
+            log.error("获取用户行程数量失败: userId={}", userId, e);
+            return Result.error("获取行程数量失败：" + e.getMessage());
+        }
     }
 
 }

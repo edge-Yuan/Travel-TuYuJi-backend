@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wanderlust.travel.travelportal.mapper.HotDestinationMapper">
+
+    <!-- 获取热门目的地列表 -->
+    <select id="selectHotDestinations" resultType="com.wanderlust.travel.travelportal.entity.HotDestination">
+        SELECT 
+            dest_id,
+            destination_name,
+            region,
+            image_url,
+            description,
+            view_count,
+            sort_order,
+            status,
+            create_time,
+            update_time
+        FROM hot_destination
+        WHERE status = 1
+        ORDER BY sort_order ASC, view_count DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 增加目的地浏览次数 -->
+    <update id="incrementViewCount">
+        UPDATE hot_destination 
+        SET view_count = view_count + 1 
+        WHERE dest_id = #{destId}
+    </update>
+
+</mapper>

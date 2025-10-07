@@ -72,11 +72,11 @@ public class TourEvaluationController {
     public Result<List<TourEvaluation>> searchEvaluations(
             @RequestParam(required = false) Long productId,
             @RequestParam(required = false) Long userId,
-            @RequestParam(required = false) Integer rating) {
+            @RequestParam(required = false) Byte overallScore) {
         List<TourEvaluation> evaluations = tourEvaluationService.lambdaQuery()
                 .eq(productId != null, TourEvaluation::getProductId, productId)
                 .eq(userId != null, TourEvaluation::getUserId, userId)
-                .eq(rating != null, TourEvaluation::getRating, rating)
+                .eq(overallScore != null, TourEvaluation::getOverallScore, overallScore)
                 .orderByDesc(TourEvaluation::getCreateTime)
                 .list();
         return Result.success(evaluations);

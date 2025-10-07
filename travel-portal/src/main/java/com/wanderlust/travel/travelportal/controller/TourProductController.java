@@ -59,6 +59,8 @@ public class TourProductController {
                         .merchantId(product.getMerchantId())
                         .productSellingPoints(product.getProductSellingPoints())
                         .supplier(product.getSupplier())
+                        .features(product.getFeatures())
+                        .featuresImgs(product.getFeaturesImgs())
                         .build())
                 .collect(Collectors.toList());
         return Result.success(productDetailsVOList);
@@ -82,6 +84,8 @@ public class TourProductController {
                 .merchantId(tourProduct.getMerchantId()) // 从数据库实体中获取商户ID
                 .productSellingPoints(tourProduct.getProductSellingPoints()) // 从数据库实体中获取产品sellingPoints
                 .supplier(tourProduct.getSupplier()) // 从数据库实体中获取供应商
+                .features(tourProduct.getFeatures()) // 从数据库实体中获取产品features
+                .featuresImgs(tourProduct.getFeaturesImgs())
                 .build();
                 return Result.success(productDetailsVO);
     }

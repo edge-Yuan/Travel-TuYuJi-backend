@@ -27,4 +27,24 @@ public class ProductBookingNoticeDTO {
     private String validityPeriod;
     
     private String notes;
+    
+    private Long creatorId;
+    
+    private Byte status;
+    
+    private Integer sortOrder;
+    
+    private String title;
+    
+    private String bookingDeadline;
+    
+    private String cancellationPolicy;
+    
+    private String refundPolicy;
+    
+    private String specialRequirements;
+    
+    private String contactInfo;
+    
+    private String emergencyContact;
 }

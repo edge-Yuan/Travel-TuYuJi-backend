@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wanderlust.travel.travelportal.mapper.EvaluationReplyMapper">
+
+    <!-- 根据评价ID获取回复列表 -->
+    <select id="selectByEvalId" resultType="com.wanderlust.travel.travelportal.entity.EvaluationReply">
+        SELECT * FROM evaluation_reply 
+        WHERE eval_id = #{evalId} AND status = 1
+        ORDER BY reply_time DESC
+    </select>
+
+    <!-- 根据评价ID删除回复 -->
+    <delete id="deleteByEvalId">
+        DELETE FROM evaluation_reply WHERE eval_id = #{evalId}
+    </delete>
+
+</mapper>

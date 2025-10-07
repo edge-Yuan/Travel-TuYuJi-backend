@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wanderlust.travel.travelportal.mapper.ScenicArticleMapper">
+
+    <!-- 分页查询文章列表（带搜索条件） -->
+    <select id="selectArticlePage" resultType="com.wanderlust.travel.travelportal.entity.ScenicArticle">
+        SELECT 
+            sa.*,
+            ap.package_name,
+            ap.package_image,
+            ap.package_price,
+            ap.product_id
+        FROM scenic_article sa
+        LEFT JOIN article_package ap ON sa.article_id = ap.article_id
+        WHERE sa.status = 1
+        <if test="keyword != null and keyword != ''">
+            AND (sa.title LIKE CONCAT('%', #{keyword}, '%') 
+                 OR sa.excerpt LIKE CONCAT('%', #{keyword}, '%')
+                 OR sa.merchant_name LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="region != null and region != ''">
+            AND sa.region = #{region}
+        </if>
+        <choose>
+            <when test="sortBy == 'popularity'">
+                ORDER BY sa.view_count DESC, sa.like_count DESC
+            </when>
+            <when test="sortBy == 'latest'">
+                ORDER BY sa.publish_time DESC
+            </when>
+            <otherwise>
+                ORDER BY sa.featured DESC, sa.publish_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+</mapper>

@@ -36,7 +36,7 @@ public class ItineraryDetailVO {
     private LocalDate endDate;
 
     @ApiModelProperty("出行人数")
-    private Integer travelers;
+    private Integer travellers;
 
     @ApiModelProperty("订单状态：0-待确认，1-已确认，2-已完成，3-已取消，4-退款中")
     private Byte orderStatus;

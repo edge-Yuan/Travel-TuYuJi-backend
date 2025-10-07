@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wanderlust.travel.traveladmin.mapper.GuideCooperationMapper">
+
+    <!-- 导游合作邀请VO结果映射 -->
+    <resultMap id="GuideCooperationVOResultMap" type="com.wanderlust.travel.traveladmin.vo.GuideCooperationVO">
+        <id column="cooperation_id" property="cooperationId"/>
+        <result column="merchant_id" property="merchantId"/>
+        <result column="merchant_name" property="merchantName"/>
+        <result column="guide_id" property="guideId"/>
+        <result column="guide_name" property="guideName"/>
+        <result column="guide_avatar" property="guideAvatar"/>
+        <result column="cooperation_type" property="cooperationType"/>
+        <result column="cooperation_type_name" property="cooperationTypeName"/>
+        <result column="start_date" property="startDate"/>
+        <result column="end_date" property="endDate"/>
+        <result column="conditions" property="conditions"/>
+        <result column="notes" property="notes"/>
+        <result column="status" property="status"/>
+        <result column="status_name" property="statusName"/>
+        <result column="reject_reason" property="rejectReason"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="response_time" property="responseTime"/>
+    </resultMap>
+
+    <!-- 分页查询合作邀请列表 -->
+    <select id="selectCooperationPage" resultMap="GuideCooperationVOResultMap">
+        SELECT 
+            gc.cooperation_id,
+            gc.merchant_id,
+            me.merchant_name,
+            gc.guide_id,
+            ge.real_name as guide_name,
+            su.avatar as guide_avatar,
+            gc.cooperation_type,
+            CASE gc.cooperation_type
+                WHEN 1 THEN '独家合作'
+                WHEN 2 THEN '合作伙伴'
+                WHEN 3 THEN '项目合作'
+                ELSE '未知'
+            END as cooperation_type_name,
+            gc.start_date,
+            gc.end_date,
+            gc.conditions,
+            gc.notes,
+            gc.status,
+            CASE gc.status
+                WHEN 0 THEN '待确认'
+                WHEN 1 THEN '已接受'
+                WHEN 2 THEN '已拒绝'
+                WHEN 3 THEN '已结束'
+                ELSE '未知'
+            END as status_name,
+            gc.reject_reason,
+            gc.create_time,
+            gc.update_time,
+            gc.response_time
+        FROM guide_cooperation gc
+        LEFT JOIN merchant_extend me ON gc.merchant_id = me.merchant_id
+        LEFT JOIN guide_extend ge ON gc.guide_id = ge.guide_id
+        LEFT JOIN sys_user su ON ge.user_id = su.user_id
+        <where>
+            <if test="merchantId != null">
+                AND gc.merchant_id = #{merchantId}
+            </if>
+            <if test="status != null">
+                AND gc.status = #{status}
+            </if>
+        </where>
+        ORDER BY gc.create_time DESC
+    </select>
+
+    <!-- 根据ID查询合作邀请详情 -->
+    <select id="selectCooperationDetail" resultMap="GuideCooperationVOResultMap">
+        SELECT 
+            gc.cooperation_id,
+            gc.merchant_id,
+            me.merchant_name,
+            gc.guide_id,
+            ge.real_name as guide_name,
+            su.avatar as guide_avatar,
+            gc.cooperation_type,
+            CASE gc.cooperation_type
+                WHEN 1 THEN '独家合作'
+                WHEN 2 THEN '合作伙伴'
+                WHEN 3 THEN '项目合作'
+                ELSE '未知'
+            END as cooperation_type_name,
+            gc.start_date,
+            gc.end_date,
+            gc.conditions,
+            gc.notes,
+            gc.status,
+            CASE gc.status
+                WHEN 0 THEN '待确认'
+                WHEN 1 THEN '已接受'
+                WHEN 2 THEN '已拒绝'
+                WHEN 3 THEN '已结束'
+                ELSE '未知'
+            END as status_name,
+            gc.reject_reason,
+            gc.create_time,
+            gc.update_time,
+            gc.response_time
+        FROM guide_cooperation gc
+        LEFT JOIN merchant_extend me ON gc.merchant_id = me.merchant_id
+        LEFT JOIN guide_extend ge ON gc.guide_id = ge.guide_id
+        LEFT JOIN sys_user su ON ge.user_id = su.user_id
+        WHERE gc.cooperation_id = #{cooperationId}
+    </select>
+
+    <!-- 查询旅行商发送的合作邀请数量 -->
+    <select id="countCooperationByMerchant" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM guide_cooperation
+        WHERE merchant_id = #{merchantId}
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+    </select>
+
+</mapper>

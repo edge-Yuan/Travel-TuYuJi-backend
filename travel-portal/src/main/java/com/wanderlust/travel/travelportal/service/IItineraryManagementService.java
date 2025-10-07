@@ -72,4 +72,10 @@ public interface IItineraryManagementService {
      * @return 是否可以取消
      */
     Boolean canCancelItinerary(Long orderId, Long userId);
+
+    /**
+     * 根据订单状态同步行程记录
+     * @param orderId 订单ID
+     */
+    void syncItineraryFromOrder(Long orderId);
 }

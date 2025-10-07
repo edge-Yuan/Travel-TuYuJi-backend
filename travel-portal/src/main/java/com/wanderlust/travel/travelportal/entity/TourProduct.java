@@ -94,6 +94,12 @@ public class TourProduct implements Serializable {
     @ApiModelProperty("供应商")
     private String supplier;
 
+    @ApiModelProperty("产品特色")
+    private String features;
+
+    @ApiModelProperty("产品特色图片")
+    private String featuresImgs;
+
     public Long getProductId() {
         return productId;
     }
@@ -278,6 +284,22 @@ public class TourProduct implements Serializable {
         this.supplier = supplier;
     }
 
+    public String getFeatures() {
+        return features;
+    }
+
+    public void setFeatures(String features) {
+        this.features = features;
+    }
+
+    public String getFeaturesImgs() {
+        return featuresImgs;
+    }
+
+    public void setFeaturesImgs(String featuresImgs) {
+        this.featuresImgs = featuresImgs;
+    }
+
     @Override
     public String toString() {
         return "TourProduct{" +
@@ -304,6 +326,8 @@ public class TourProduct implements Serializable {
             ", productSellingPoints = " + productSellingPoints +
             ", categoryId = " + categoryId +
             ", supplier = " + supplier +
+            ", features = " + features +
+            "featuresImgs = " + featuresImgs +
         "}";
     }
 }

@@ -6,6 +6,7 @@ import com.wanderlust.travel.travelportal.dto.ItineraryCancelDTO;
 import com.wanderlust.travel.travelportal.dto.ItineraryModifyDTO;
 import com.wanderlust.travel.travelportal.entity.*;
 import com.wanderlust.travel.travelportal.mapper.*;
+import com.wanderlust.travel.travelportal.entity.TourItinerary;
 import com.wanderlust.travel.travelportal.service.IItineraryManagementService;
 import com.wanderlust.travel.travelportal.vo.ItineraryDetailVO;
 import com.wanderlust.travel.travelportal.vo.ItineraryListVO;
@@ -53,53 +54,58 @@ public class ItineraryManagementServiceImpl implements IItineraryManagementServi
 
     @Override
     public Page<ItineraryListVO> getUserItineraries(Long userId, String status, Integer page, Integer size) {
-        Page<TourOrder> orderPage = new Page<>(page, size);
+        Page<TourItinerary> itineraryPage = new Page<>(page, size);
         
-        LambdaQueryWrapper<TourOrder> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(TourOrder::getUserId, userId);
+        LambdaQueryWrapper<TourItinerary> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(TourItinerary::getUserId, userId);
         
         // 根据状态筛选
         if (!"all".equals(status)) {
             switch (status) {
                 case "upcoming":
-                    queryWrapper.eq(TourOrder::getOrderStatus, 1) // 已确认
-                               .gt(TourOrder::getBookingDate, LocalDate.now());
+                    // 待出行：订单已确认(1) 且 预订日期大于今天
+                    queryWrapper.eq(TourItinerary::getOrderStatus, 1) // 已确认
+                               .gt(TourItinerary::getBookingDate, LocalDate.now());
                     break;
                 case "completed":
-                    queryWrapper.eq(TourOrder::getOrderStatus, 2); // 已完成
+                    // 已完成：订单已完成(2) 且 预订日期小于等于今天
+                    queryWrapper.eq(TourItinerary::getOrderStatus, 2) // 已完成
+                               .le(TourItinerary::getBookingDate, LocalDate.now());
                     break;
                 case "cancelled":
-                    queryWrapper.eq(TourOrder::getOrderStatus, 3); // 已取消
+                    queryWrapper.eq(TourItinerary::getOrderStatus, 3); // 已取消
                     break;
             }
         }
         
-        queryWrapper.orderByDesc(TourOrder::getCreateTime);
+        queryWrapper.orderByDesc(TourItinerary::getCreateTime);
         
-        Page<TourOrder> orders = tourOrderMapper.selectPage(orderPage, queryWrapper);
+        Page<TourItinerary> itineraries = tourItineraryMapper.selectPage(itineraryPage, queryWrapper);
         
         // 转换为VO
         Page<ItineraryListVO> result = new Page<>(page, size);
-        BeanUtils.copyProperties(orders, result, "records");
+        BeanUtils.copyProperties(itineraries, result, "records");
         
-        List<ItineraryListVO> voList = orders.getRecords().stream().map(order -> {
+        List<ItineraryListVO> voList = itineraries.getRecords().stream().map(itinerary -> {
             ItineraryListVO vo = new ItineraryListVO();
-            BeanUtils.copyProperties(order, vo);
+            BeanUtils.copyProperties(itinerary, vo);
             
             // 设置订单编号
-            vo.setOrderNumber("TRIP" + order.getOrderId());
+            vo.setOrderNumber("TRIP" + itinerary.getOrderId());
             
             // 设置行程标题（使用产品名称）
-            TourProduct product = tourProductMapper.selectById(order.getProductId());
+            TourProduct product = tourProductMapper.selectById(itinerary.getProductId());
             if (product != null) {
                 vo.setProductName(product.getProductName());
                 vo.setProductImage(product.getMainImgUrl());
                 vo.setTitle(product.getProductName());
+                vo.setStartDate(product.getStartDate());
+                vo.setEndDate(product.getEndDate());
             }
             
             // 设置导游信息
-            if (order.getGuideId() != null) {
-                GuideExtend guide = guideExtendMapper.selectById(order.getGuideId());
+            if (itinerary.getGuideId() != null) {
+                GuideExtend guide = guideExtendMapper.selectById(itinerary.getGuideId());
                 if (guide != null) {
                     ItineraryListVO.GuideBasicInfo guideInfo = new ItineraryListVO.GuideBasicInfo();
                     guideInfo.setGuideId(guide.getGuideId());
@@ -121,25 +127,25 @@ public class ItineraryManagementServiceImpl implements IItineraryManagementServi
 
     @Override
     public ItineraryDetailVO getItineraryDetail(Long orderId, Long userId) {
-        // 获取订单信息
-        TourOrder order = tourOrderMapper.selectOne(
-            new LambdaQueryWrapper<TourOrder>()
-                .eq(TourOrder::getOrderId, orderId)
-                .eq(TourOrder::getUserId, userId)
+        // 获取行程信息
+        TourItinerary itinerary = tourItineraryMapper.selectOne(
+            new LambdaQueryWrapper<TourItinerary>()
+                .eq(TourItinerary::getOrderId, orderId)
+                .eq(TourItinerary::getUserId, userId)
         );
         
-        if (order == null) {
+        if (itinerary == null) {
             return null;
         }
         
         ItineraryDetailVO vo = new ItineraryDetailVO();
-        BeanUtils.copyProperties(order, vo);
+        BeanUtils.copyProperties(itinerary, vo);
         
         // 设置订单编号
-        vo.setOrderNumber("TRIP" + order.getOrderId());
+        vo.setOrderNumber("TRIP" + itinerary.getOrderId());
         
         // 设置产品信息
-        TourProduct product = tourProductMapper.selectById(order.getProductId());
+        TourProduct product = tourProductMapper.selectById(itinerary.getProductId());
         if (product != null) {
             ItineraryDetailVO.ProductInfo productInfo = new ItineraryDetailVO.ProductInfo();
             productInfo.setProductId(product.getProductId());
@@ -148,11 +154,13 @@ public class ItineraryManagementServiceImpl implements IItineraryManagementServi
             productInfo.setImgUrls(product.getImgUrls());
             vo.setProductInfo(productInfo);
             vo.setTitle(product.getProductName());
+            vo.setStartDate(product.getStartDate());
+            vo.setTravellers(itinerary.getTravellers());
         }
         
         // 设置导游信息
-        if (order.getGuideId() != null) {
-            GuideExtend guide = guideExtendMapper.selectById(order.getGuideId());
+        if (itinerary.getGuideId() != null) {
+            GuideExtend guide = guideExtendMapper.selectById(itinerary.getGuideId());
             if (guide != null) {
                 ItineraryDetailVO.GuideInfo guideInfo = new ItineraryDetailVO.GuideInfo();
                 guideInfo.setGuideId(guide.getGuideId());
@@ -172,7 +180,7 @@ public class ItineraryManagementServiceImpl implements IItineraryManagementServi
         vo.setDailySchedule(getDailySchedule(orderId));
         
         // 设置重要提示
-        vo.setNotes(order.getSpecialNeeds());
+        vo.setNotes(itinerary.getSpecialNeeds());
         
         return vo;
     }
@@ -180,29 +188,29 @@ public class ItineraryManagementServiceImpl implements IItineraryManagementServi
     @Override
     @Transactional
     public Boolean modifyItinerary(ItineraryModifyDTO modifyDTO, Long userId) {
-        // 检查订单是否存在且属于当前用户
-        TourOrder order = tourOrderMapper.selectOne(
-            new LambdaQueryWrapper<TourOrder>()
-                .eq(TourOrder::getOrderId, modifyDTO.getOrderId())
-                .eq(TourOrder::getUserId, userId)
+        // 检查行程是否存在且属于当前用户
+        TourItinerary itinerary = tourItineraryMapper.selectOne(
+            new LambdaQueryWrapper<TourItinerary>()
+                .eq(TourItinerary::getOrderId, modifyDTO.getOrderId())
+                .eq(TourItinerary::getUserId, userId)
         );
         
-        if (order == null) {
-            throw new RuntimeException("订单不存在");
+        if (itinerary == null) {
+            throw new RuntimeException("行程不存在");
         }
         
         // 检查是否可以修改
         if (!canModifyItinerary(modifyDTO.getOrderId(), userId)) {
-            throw new RuntimeException("当前订单状态不允许修改");
+            throw new RuntimeException("当前行程状态不允许修改");
         }
         
-        // 更新订单信息
-        order.setBookingDate(modifyDTO.getStartDate());
-        order.setPersonCount(modifyDTO.getTravelers());
-        order.setSpecialNeeds(modifyDTO.getNotes());
-        order.setOrderStatus((byte) 4); // 设置为修改待确认状态
+        // 更新行程信息
+        itinerary.setBookingDate(modifyDTO.getStartDate());
+        itinerary.setTravellers(modifyDTO.getTravelers());
+        itinerary.setSpecialNeeds(modifyDTO.getNotes());
+        itinerary.setOrderStatus((byte) 4); // 设置为修改待确认状态
         
-        int updateResult = tourOrderMapper.updateById(order);
+        int updateResult = tourItineraryMapper.updateById(itinerary);
         
         if (updateResult > 0) {
             // 记录状态变更日志
@@ -225,40 +233,39 @@ public class ItineraryManagementServiceImpl implements IItineraryManagementServi
     @Override
     @Transactional
     public Boolean cancelItinerary(ItineraryCancelDTO cancelDTO, Long userId) {
-        // 检查订单是否存在且属于当前用户
-        TourOrder order = tourOrderMapper.selectOne(
-            new LambdaQueryWrapper<TourOrder>()
-                .eq(TourOrder::getOrderId, cancelDTO.getOrderId())
-                .eq(TourOrder::getUserId, userId)
+        // 检查行程是否存在且属于当前用户
+        TourItinerary itinerary = tourItineraryMapper.selectOne(
+            new LambdaQueryWrapper<TourItinerary>()
+                .eq(TourItinerary::getOrderId, cancelDTO.getOrderId())
+                .eq(TourItinerary::getUserId, userId)
         );
         
-        if (order == null) {
-            throw new RuntimeException("订单不存在");
+        if (itinerary == null) {
+            throw new RuntimeException("行程不存在");
         }
         
         // 检查是否可以取消
         if (!canCancelItinerary(cancelDTO.getOrderId(), userId)) {
-            throw new RuntimeException("当前订单状态不允许取消");
+            throw new RuntimeException("当前行程状态不允许取消");
         }
         
         // 计算退款金额
         RefundInfoVO refundInfo = getRefundInfo(cancelDTO.getOrderId(), userId);
         
-        // 更新订单状态
-        order.setOrderStatus((byte) 3); // 已取消
-        order.setCancelTime(LocalDateTime.now());
+        // 更新行程状态
+        itinerary.setOrderStatus((byte) 3); // 已取消
+        itinerary.setCancelTime(LocalDateTime.now());
         if (refundInfo.getRefundPercentage() > 0) {
-            order.setPayStatus((byte) 2); // 已退款
-            order.setRefundAmount(refundInfo.getRefundAmount());
+            itinerary.setPayStatus((byte) 2); // 已退款
         }
         
-        int updateResult = tourOrderMapper.updateById(order);
+        int updateResult = tourItineraryMapper.updateById(itinerary);
         
         if (updateResult > 0) {
             // 记录状态变更日志
             OrderStatusLog log = new OrderStatusLog();
             log.setOrderId(cancelDTO.getOrderId());
-            log.setFromStatus(order.getOrderStatus());
+            log.setFromStatus(itinerary.getOrderStatus());
             log.setToStatus((byte) 3); // 已取消
             log.setReason("用户取消行程");
             log.setOperatorId(userId);
@@ -274,13 +281,13 @@ public class ItineraryManagementServiceImpl implements IItineraryManagementServi
 
     @Override
     public RefundInfoVO getRefundInfo(Long orderId, Long userId) {
-        TourOrder order = tourOrderMapper.selectOne(
-            new LambdaQueryWrapper<TourOrder>()
-                .eq(TourOrder::getOrderId, orderId)
-                .eq(TourOrder::getUserId, userId)
+        TourItinerary itinerary = tourItineraryMapper.selectOne(
+            new LambdaQueryWrapper<TourItinerary>()
+                .eq(TourItinerary::getOrderId, orderId)
+                .eq(TourItinerary::getUserId, userId)
         );
         
-        if (order == null) {
+        if (itinerary == null) {
             return null;
         }
         
@@ -288,7 +295,7 @@ public class ItineraryManagementServiceImpl implements IItineraryManagementServi
         
         // 计算距离出发的天数
         LocalDate today = LocalDate.now();
-        LocalDate startDate = order.getBookingDate();
+        LocalDate startDate = itinerary.getBookingDate();
         long days = ChronoUnit.DAYS.between(today, startDate);
         refundInfo.setDaysBeforeDeparture((int) days);
         
@@ -306,7 +313,7 @@ public class ItineraryManagementServiceImpl implements IItineraryManagementServi
         refundInfo.setRefundPercentage(refundPercentage);
         
         // 计算退款金额
-        BigDecimal refundAmount = order.getOrderAmount().multiply(
+        BigDecimal refundAmount = itinerary.getTotalPrice().multiply(
             BigDecimal.valueOf(refundPercentage).divide(BigDecimal.valueOf(100))
         );
         refundInfo.setRefundAmount(refundAmount);
@@ -322,22 +329,22 @@ public class ItineraryManagementServiceImpl implements IItineraryManagementServi
 
     @Override
     public Boolean canModifyItinerary(Long orderId, Long userId) {
-        TourOrder order = tourOrderMapper.selectOne(
-            new LambdaQueryWrapper<TourOrder>()
-                .eq(TourOrder::getOrderId, orderId)
-                .eq(TourOrder::getUserId, userId)
+        TourItinerary itinerary = tourItineraryMapper.selectOne(
+            new LambdaQueryWrapper<TourItinerary>()
+                .eq(TourItinerary::getOrderId, orderId)
+                .eq(TourItinerary::getUserId, userId)
         );
         
-        if (order == null) {
+        if (itinerary == null) {
             return false;
         }
         
         // 只有已确认且未过期的行程可以修改
-        if (order.getOrderStatus() != 1) {
+        if (itinerary.getOrderStatus() != 1) {
             return false;
         }
         
-        LocalDate startDate = order.getBookingDate();
+        LocalDate startDate = itinerary.getBookingDate();
         LocalDate today = LocalDate.now();
         // 出发前1天以上可以修改
         return startDate.isAfter(today.plusDays(1));
@@ -345,25 +352,86 @@ public class ItineraryManagementServiceImpl implements IItineraryManagementServi
 
     @Override
     public Boolean canCancelItinerary(Long orderId, Long userId) {
-        TourOrder order = tourOrderMapper.selectOne(
-            new LambdaQueryWrapper<TourOrder>()
-                .eq(TourOrder::getOrderId, orderId)
-                .eq(TourOrder::getUserId, userId)
+        TourItinerary itinerary = tourItineraryMapper.selectOne(
+            new LambdaQueryWrapper<TourItinerary>()
+                .eq(TourItinerary::getOrderId, orderId)
+                .eq(TourItinerary::getUserId, userId)
         );
         
-        if (order == null) {
+        if (itinerary == null) {
             return false;
         }
         
         // 只有已确认且未过期的行程可以取消
-        if (order.getOrderStatus() != 1) {
+        if (itinerary.getOrderStatus() != 1) {
             return false;
         }
         
-        LocalDate startDate = order.getBookingDate();
+        LocalDate startDate = itinerary.getBookingDate();
         LocalDate today = LocalDate.now();
         // 出发当天及之前可以取消（但可能不退款）
         return !startDate.isBefore(today);
+    }
+
+    /**
+     * 根据订单状态同步行程记录
+     * 当订单状态为已确认(1)时，创建行程记录
+     * 当订单状态为已完成(2)时，更新行程状态为已完成
+     */
+    @Transactional
+    public void syncItineraryFromOrder(Long orderId) {
+        // 获取订单信息
+        TourOrder order = tourOrderMapper.selectById(orderId);
+        if (order == null) {
+            return;
+        }
+        
+        if (order.getOrderStatus() == 1 && order.getPayStatus() == 1) { // 已确认且已支付
+            // 检查是否已存在行程记录
+            TourItinerary existingItinerary = tourItineraryMapper.selectOne(
+                new LambdaQueryWrapper<TourItinerary>()
+                    .eq(TourItinerary::getOrderId, orderId)
+            );
+            
+            if (existingItinerary == null) {
+                // 创建新的行程记录
+                TourItinerary itinerary = new TourItinerary();
+                itinerary.setOrderId(order.getOrderId());
+                itinerary.setUserId(order.getUserId());
+                itinerary.setProductId(order.getProductId());
+                itinerary.setGuideId(order.getGuideId());
+                itinerary.setOrderStatus(order.getOrderStatus());
+                itinerary.setPayStatus(order.getPayStatus());
+                itinerary.setPayType(order.getPayType());
+                itinerary.setTotalPrice(order.getTotalPrice());
+                itinerary.setTravellers(order.getTravellers());
+                itinerary.setBookingDate(order.getBookingDate());
+                itinerary.setSpecialNeeds(order.getSpecialNeeds());
+                itinerary.setReceiverName(order.getReceiverName());
+                itinerary.setReceiverPhone(order.getReceiverPhone());
+                itinerary.setReceiverAddress(order.getReceiverAddress());
+                itinerary.setCreateTime(order.getCreateTime());
+                itinerary.setUpdateTime(LocalDateTime.now());
+                itinerary.setCancelTime(order.getCancelTime());
+                itinerary.setItineraryDate(order.getBookingDate());
+                itinerary.setDaySeq(1);
+                itinerary.setStatus((byte) 0); // 未开始
+                
+                tourItineraryMapper.insert(itinerary);
+            }
+        } else if (order.getOrderStatus() == 2) { // 已完成
+            // 更新现有行程记录状态
+            TourItinerary itinerary = tourItineraryMapper.selectOne(
+                new LambdaQueryWrapper<TourItinerary>()
+                    .eq(TourItinerary::getOrderId, orderId)
+            );
+            
+            if (itinerary != null) {
+                itinerary.setOrderStatus(order.getOrderStatus());
+                itinerary.setUpdateTime(LocalDateTime.now());
+                tourItineraryMapper.updateById(itinerary);
+            }
+        }
     }
 
     /**

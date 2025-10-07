@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wanderlust.travel.traveladmin.mapper.ServiceExceptionMapper">
+
+    <!-- 根据服务ID查询异常列表 -->
+    <select id="selectByServiceId" resultType="com.wanderlust.travel.traveladmin.entity.ServiceException">
+        SELECT * FROM service_exception 
+        WHERE service_id = #{serviceId}
+        ORDER BY exception_time DESC
+    </select>
+
+    <!-- 根据异常状态查询异常列表 -->
+    <select id="selectByStatus" resultType="com.wanderlust.travel.traveladmin.entity.ServiceException">
+        SELECT * FROM service_exception 
+        WHERE status = #{status}
+        ORDER BY exception_time DESC
+    </select>
+
+    <!-- 根据紧急程度查询异常列表 -->
+    <select id="selectByPriority" resultType="com.wanderlust.travel.traveladmin.entity.ServiceException">
+        SELECT * FROM service_exception 
+        WHERE priority = #{priority}
+        ORDER BY exception_time DESC
+    </select>
+
+</mapper>

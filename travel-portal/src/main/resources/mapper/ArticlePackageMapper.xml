@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wanderlust.travel.travelportal.mapper.ArticlePackageMapper">
+
+    <!-- 根据文章ID获取关联套餐列表 -->
+    <select id="selectPackagesByArticleId" resultType="java.util.Map">
+        SELECT 
+            ap.rel_id,
+            ap.article_id,
+            ap.product_id,
+            ap.package_name,
+            ap.package_image,
+            ap.package_price,
+            ap.sort_order,
+            tp.product_name,
+            tp.main_img_url,
+            tp.price,
+            tp.product_status
+        FROM article_package ap
+        LEFT JOIN tour_product tp ON ap.product_id = tp.product_id
+        WHERE ap.article_id = #{articleId}
+        AND tp.product_status = 1
+        ORDER BY ap.sort_order ASC
+    </select>
+
+</mapper>

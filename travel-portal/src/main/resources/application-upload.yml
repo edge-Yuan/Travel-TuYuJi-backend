@@ -1,0 +1,52 @@
+# 文件上传配置
+file:
+  upload:
+    # 文件上传根路径 - 优先使用配置的路径，失败时自动降级
+    base-path: ${UPLOAD_PATH:${java.io.tmpdir}/uploads}
+    # 文件访问URL前缀
+    url-prefix: ${FILE_URL_PREFIX:http://localhost:8080}
+    # 头像上传配置
+    avatar:
+      path: /avatars
+      max-size: 2097152  # 2MB
+      allowed-types:
+        - image/jpeg
+        - image/png
+        - image/gif
+    # 资质证明上传配置
+    qualification:
+      path: /qualifications
+      max-size: 10485760  # 10MB
+      allowed-types:
+        - application/pdf
+        - image/jpeg
+        - image/png
+    # 产品图片上传配置
+    product:
+      path: /products
+      max-size: 5242880  # 5MB
+      allowed-types:
+        - image/jpeg
+        - image/png
+        - image/gif
+    # 文章图片上传配置
+    article:
+      path: /articles
+      max-size: 5242880  # 5MB
+      allowed-types:
+        - image/jpeg
+        - image/png
+        - image/gif
+
+# Spring Boot 文件上传配置
+spring:
+  servlet:
+    multipart:
+      # 单个文件最大大小
+      max-file-size: 10MB
+      # 总上传数据最大大小
+      max-request-size: 100MB
+      # 文件写入磁盘的阈值
+      file-size-threshold: 2KB
+      # 是否延迟解析multipart请求
+      resolve-lazily: false

@@ -41,9 +41,6 @@ public class TourEvaluation implements Serializable {
     @ApiModelProperty("评价用户ID")
     private Long userId;
     
-    @ApiModelProperty("评分（1-5分）")
-    private Integer rating;
-    
     @ApiModelProperty("创建时间")
     private LocalDateTime createTime;
 
@@ -192,14 +189,6 @@ public class TourEvaluation implements Serializable {
     
     public void setUserId(Long userId) {
         this.userId = userId;
-    }
-    
-    public Integer getRating() {
-        return rating;
-    }
-    
-    public void setRating(Integer rating) {
-        this.rating = rating;
     }
     
     public LocalDateTime getCreateTime() {

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -39,45 +40,41 @@ public class ProductBookingNotice implements Serializable {
     @ApiModelProperty("其他注意事项")
     private String notes;
 
-    public Long getNoticeId() {
-        return noticeId;
-    }
+    @ApiModelProperty("创建时间")
+    private LocalDateTime createTime;
 
-    public void setNoticeId(Long noticeId) {
-        this.noticeId = noticeId;
-    }
+    @ApiModelProperty("更新时间")
+    private LocalDateTime updateTime;
 
-    public Long getProductId() {
-        return productId;
-    }
+    @ApiModelProperty("创建人ID")
+    private Long creatorId;
 
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
+    @ApiModelProperty("状态：0-禁用，1-启用")
+    private Byte status;
 
-    public String getBookingConditions() {
-        return bookingConditions;
-    }
+    @ApiModelProperty("排序序号")
+    private Integer sortOrder;
 
-    public void setBookingConditions(String bookingConditions) {
-        this.bookingConditions = bookingConditions;
-    }
+    @ApiModelProperty("须知标题")
+    private String title;
 
-    public String getValidityPeriod() {
-        return validityPeriod;
-    }
+    @ApiModelProperty("预订截止时间说明")
+    private String bookingDeadline;
 
-    public void setValidityPeriod(String validityPeriod) {
-        this.validityPeriod = validityPeriod;
-    }
+    @ApiModelProperty("取消政策")
+    private String cancellationPolicy;
 
-    public String getNotes() {
-        return notes;
-    }
+    @ApiModelProperty("退款政策")
+    private String refundPolicy;
 
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
+    @ApiModelProperty("特殊要求说明")
+    private String specialRequirements;
+
+    @ApiModelProperty("联系方式")
+    private String contactInfo;
+
+    @ApiModelProperty("紧急联系方式")
+    private String emergencyContact;
 
     @Override
     public String toString() {
@@ -87,6 +84,18 @@ public class ProductBookingNotice implements Serializable {
             ", bookingConditions = " + bookingConditions +
             ", validityPeriod = " + validityPeriod +
             ", notes = " + notes +
+            ", createTime = " + createTime +
+            ", updateTime = " + updateTime +
+            ", creatorId = " + creatorId +
+            ", status = " + status +
+            ", sortOrder = " + sortOrder +
+            ", title = " + title +
+            ", bookingDeadline = " + bookingDeadline +
+            ", cancellationPolicy = " + cancellationPolicy +
+            ", refundPolicy = " + refundPolicy +
+            ", specialRequirements = " + specialRequirements +
+            ", contactInfo = " + contactInfo +
+            ", emergencyContact = " + emergencyContact +
         "}";
     }
 }

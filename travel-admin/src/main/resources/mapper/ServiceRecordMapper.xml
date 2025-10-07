@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wanderlust.travel.traveladmin.mapper.ServiceRecordMapper">
+
+    <!-- 根据服务ID查询记录列表 -->
+    <select id="selectByServiceId" resultType="com.wanderlust.travel.traveladmin.entity.ServiceRecord">
+        SELECT * FROM service_record 
+        WHERE service_id = #{serviceId}
+        ORDER BY record_time DESC
+    </select>
+
+    <!-- 根据记录类型查询记录列表 -->
+    <select id="selectByRecordType" resultType="com.wanderlust.travel.traveladmin.entity.ServiceRecord">
+        SELECT * FROM service_record 
+        WHERE service_id = #{serviceId}
+        <if test="recordType != null and recordType != ''">
+            AND record_type = #{recordType}
+        </if>
+        ORDER BY record_time DESC
+    </select>
+
+</mapper>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wanderlust.travel.traveladmin.mapper.ArticlePackageMapper">
+
+    <!-- 批量插入文章套餐关联 -->
+    <insert id="batchInsert">
+        INSERT INTO article_package (article_id, product_id, package_name, package_image, package_price, sort_order, create_time, update_time)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.articleId}, #{item.productId}, #{item.packageName}, #{item.packageImage}, 
+             #{item.packagePrice}, #{item.sortOrder}, NOW(), NOW())
+        </foreach>
+    </insert>
+
+</mapper>

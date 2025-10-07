@@ -2,6 +2,7 @@ package com.wanderlust.travel.travelportal.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -38,7 +39,7 @@ public class TourOrder implements Serializable {
     private Long guideId;
 
     @ApiModelProperty("订单总金额")
-    private BigDecimal orderAmount;
+    private BigDecimal totalPrice;
 
     @ApiModelProperty("支付方式：1-微信，2-支付宝")
     private Byte payType;
@@ -53,10 +54,48 @@ public class TourOrder implements Serializable {
     private LocalDate bookingDate;
 
     @ApiModelProperty("出行人数")
-    private Integer personCount;
+    @TableField("person_count")
+    private Integer travellers;
+
+    // 为兼容历史库结构：同时写入旧列 travellers（非空约束，无默认值）
+    @TableField("travellers")
+    private Integer travellersLegacy;
 
     @ApiModelProperty("特殊需求")
     private String specialNeeds;
+
+    @ApiModelProperty("收货人姓名")
+    private String receiverName;
+
+    @ApiModelProperty("收货人电话")
+    private String receiverPhone;
+
+    @ApiModelProperty("收货省份")
+    private String receiverProvince;
+
+    @ApiModelProperty("收货城市")
+    private String receiverCity;
+
+    @ApiModelProperty("收货区县")
+    private String receiverDistrict;
+
+    @ApiModelProperty("详细收货地址")
+    private String receiverAddress;
+
+    @ApiModelProperty("订单备注")
+    private String orderRemark;
+
+    @ApiModelProperty("使用的优惠券ID")
+    private Long couponId;
+
+    @ApiModelProperty("优惠券折扣金额")
+    private BigDecimal couponDiscount;
+
+    @ApiModelProperty("运费")
+    private BigDecimal shippingFee;
+
+    @ApiModelProperty("商品数量")
+    private Integer productQuantity;
 
     @ApiModelProperty("订单创建时间")
     private LocalDateTime createTime;
@@ -69,6 +108,21 @@ public class TourOrder implements Serializable {
 
     @ApiModelProperty("退款金额")
     private BigDecimal refundAmount;
+
+    @ApiModelProperty("扫码时间")
+    private LocalDateTime scanTime;
+
+    @ApiModelProperty("扫码状态：0-未扫码，1-已扫码")
+    private Byte scanStatus;
+
+    @ApiModelProperty("微信支付交易号")
+    private String wechatTradeNo;
+
+    @ApiModelProperty("微信支付状态")
+    private String wechatTradeStatus;
+
+    @ApiModelProperty("扫码确认时间")
+    private LocalDateTime scanConfirmTime;
 
     public Long getOrderId() {
         return orderId;
@@ -102,12 +156,12 @@ public class TourOrder implements Serializable {
         this.guideId = guideId;
     }
 
-    public BigDecimal getOrderAmount() {
-        return orderAmount;
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
     }
 
-    public void setOrderAmount(BigDecimal orderAmount) {
-        this.orderAmount = orderAmount;
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
     public Byte getPayType() {
@@ -142,12 +196,20 @@ public class TourOrder implements Serializable {
         this.bookingDate = bookingDate;
     }
 
-    public Integer getPersonCount() {
-        return personCount;
+    public Integer getTravellers() {
+        return travellers;
     }
 
-    public void setPersonCount(Integer personCount) {
-        this.personCount = personCount;
+    public void setTravellers(Integer travellers) {
+        this.travellers = travellers;
+    }
+
+    public Integer getTravellersLegacy() {
+        return travellersLegacy;
+    }
+
+    public void setTravellersLegacy(Integer travellersLegacy) {
+        this.travellersLegacy = travellersLegacy;
     }
 
     public String getSpecialNeeds() {
@@ -156,6 +218,94 @@ public class TourOrder implements Serializable {
 
     public void setSpecialNeeds(String specialNeeds) {
         this.specialNeeds = specialNeeds;
+    }
+
+    public String getReceiverName() {
+        return receiverName;
+    }
+
+    public void setReceiverName(String receiverName) {
+        this.receiverName = receiverName;
+    }
+
+    public String getReceiverPhone() {
+        return receiverPhone;
+    }
+
+    public void setReceiverPhone(String receiverPhone) {
+        this.receiverPhone = receiverPhone;
+    }
+
+    public String getReceiverProvince() {
+        return receiverProvince;
+    }
+
+    public void setReceiverProvince(String receiverProvince) {
+        this.receiverProvince = receiverProvince;
+    }
+
+    public String getReceiverCity() {
+        return receiverCity;
+    }
+
+    public void setReceiverCity(String receiverCity) {
+        this.receiverCity = receiverCity;
+    }
+
+    public String getReceiverDistrict() {
+        return receiverDistrict;
+    }
+
+    public void setReceiverDistrict(String receiverDistrict) {
+        this.receiverDistrict = receiverDistrict;
+    }
+
+    public String getReceiverAddress() {
+        return receiverAddress;
+    }
+
+    public void setReceiverAddress(String receiverAddress) {
+        this.receiverAddress = receiverAddress;
+    }
+
+    public String getOrderRemark() {
+        return orderRemark;
+    }
+
+    public void setOrderRemark(String orderRemark) {
+        this.orderRemark = orderRemark;
+    }
+
+    public Long getCouponId() {
+        return couponId;
+    }
+
+    public void setCouponId(Long couponId) {
+        this.couponId = couponId;
+    }
+
+    public BigDecimal getCouponDiscount() {
+        return couponDiscount;
+    }
+
+    public void setCouponDiscount(BigDecimal couponDiscount) {
+        this.couponDiscount = couponDiscount;
+    }
+
+    public BigDecimal getShippingFee() {
+        return shippingFee;
+    }
+
+    public void setShippingFee(BigDecimal shippingFee) {
+        this.shippingFee = shippingFee;
+    }
+
+    public Integer getProductQuantity() {
+        return productQuantity;
+    }
+
+    public void setProductQuantity(Integer productQuantity) {
+        this.productQuantity = productQuantity;
     }
 
     public LocalDateTime getCreateTime() {
@@ -190,6 +340,46 @@ public class TourOrder implements Serializable {
         this.refundAmount = refundAmount;
     }
 
+    public LocalDateTime getScanTime() {
+        return scanTime;
+    }
+
+    public void setScanTime(LocalDateTime scanTime) {
+        this.scanTime = scanTime;
+    }
+
+    public Byte getScanStatus() {
+        return scanStatus;
+    }
+
+    public void setScanStatus(Byte scanStatus) {
+        this.scanStatus = scanStatus;
+    }
+
+    public String getWechatTradeNo() {
+        return wechatTradeNo;
+    }
+
+    public void setWechatTradeNo(String wechatTradeNo) {
+        this.wechatTradeNo = wechatTradeNo;
+    }
+
+    public String getWechatTradeStatus() {
+        return wechatTradeStatus;
+    }
+
+    public void setWechatTradeStatus(String wechatTradeStatus) {
+        this.wechatTradeStatus = wechatTradeStatus;
+    }
+
+    public LocalDateTime getScanConfirmTime() {
+        return scanConfirmTime;
+    }
+
+    public void setScanConfirmTime(LocalDateTime scanConfirmTime) {
+        this.scanConfirmTime = scanConfirmTime;
+    }
+
     @Override
     public String toString() {
         return "TourOrder{" +
@@ -197,17 +387,22 @@ public class TourOrder implements Serializable {
             ", userId = " + userId +
             ", productId = " + productId +
             ", guideId = " + guideId +
-            ", orderAmount = " + orderAmount +
+            ", totalPrice = " + totalPrice +
             ", payType = " + payType +
             ", payStatus = " + payStatus +
             ", orderStatus = " + orderStatus +
             ", bookingDate = " + bookingDate +
-            ", personCount = " + personCount +
+            ", travellers = " + travellers +
             ", specialNeeds = " + specialNeeds +
             ", createTime = " + createTime +
             ", payTime = " + payTime +
             ", cancelTime = " + cancelTime +
             ", refundAmount = " + refundAmount +
+            ", scanTime = " + scanTime +
+            ", scanStatus = " + scanStatus +
+            ", wechatTradeNo = " + wechatTradeNo +
+            ", wechatTradeStatus = " + wechatTradeStatus +
+            ", scanConfirmTime = " + scanConfirmTime +
         "}";
     }
 }

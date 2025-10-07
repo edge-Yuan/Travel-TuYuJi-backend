@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wanderlust.travel.traveladmin.mapper.ProductStatisticsMapper">
+
+    <!-- 获取产品统计数据 -->
+    <select id="selectProductStatistics" resultType="com.wanderlust.travel.traveladmin.vo.ProductStatisticsVO">
+        SELECT 
+            COUNT(*) as totalProducts,
+            SUM(CASE WHEN product_status = 1 THEN 1 ELSE 0 END) as activeProducts,
+            SUM(CASE WHEN product_status = 0 THEN 1 ELSE 0 END) as inactiveProducts,
+            SUM(sold_count) as totalSales,
+            SUM(price * sold_count) as totalRevenue,
+            AVG(price) as averagePrice
+        FROM tour_product
+        WHERE merchant_id = #{merchantId}
+    </select>
+
+    <!-- 获取产品类型统计 -->
+    <select id="selectProductTypeStatistics" resultType="com.wanderlust.travel.traveladmin.vo.ProductStatisticsVO$ProductTypeStatVO">
+        SELECT 
+            product_type as productType,
+            CASE 
+                WHEN product_type = 1 THEN '旅行路线'
+                WHEN product_type = 2 THEN '酒店客房'
+                WHEN product_type = 3 THEN '景区门票'
+                ELSE '其他'
+            END as typeName,
+            COUNT(*) as count,
+            SUM(sold_count) as sales,
+            SUM(price * sold_count) as revenue
+        FROM tour_product
+        WHERE merchant_id = #{merchantId}
+        GROUP BY product_type
+        ORDER BY count DESC
+    </select>
+
+    <!-- 获取热销产品列表 -->
+    <select id="selectTopSellingProducts" resultType="com.wanderlust.travel.traveladmin.vo.ProductStatisticsVO$TopSellingProductVO">
+        SELECT 
+            product_id as productId,
+            product_name as productName,
+            sold_count as salesCount,
+            price * sold_count as revenue
+        FROM tour_product
+        WHERE merchant_id = #{merchantId}
+        AND sold_count > 0
+        ORDER BY sold_count DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 获取销售趋势数据 -->
+    <select id="selectSalesTrend" resultType="com.wanderlust.travel.traveladmin.vo.ProductStatisticsVO$SalesTrendVO">
+        SELECT 
+            DATE(create_time) as date,
+            COUNT(*) as sales,
+            SUM(price * sold_count) as revenue
+        FROM tour_product
+        WHERE merchant_id = #{merchantId}
+        AND DATE(create_time) BETWEEN #{startDate} AND #{endDate}
+        GROUP BY DATE(create_time)
+        ORDER BY date ASC
+    </select>
+
+    <!-- 更新或插入统计数据 -->
+    <insert id="upsertStatistics" parameterType="com.wanderlust.travel.traveladmin.entity.ProductStatistics">
+        INSERT INTO product_statistics (
+            merchant_id, stat_date, total_products, active_products, 
+            inactive_products, total_sales, total_revenue, average_price
+        ) VALUES (
+            #{merchantId}, #{statDate}, #{totalProducts}, #{activeProducts},
+            #{inactiveProducts}, #{totalSales}, #{totalRevenue}, #{averagePrice}
+        )
+        ON DUPLICATE KEY UPDATE
+            total_products = VALUES(total_products),
+            active_products = VALUES(active_products),
+            inactive_products = VALUES(inactive_products),
+            total_sales = VALUES(total_sales),
+            total_revenue = VALUES(total_revenue),
+            average_price = VALUES(average_price),
+            update_time = NOW()
+    </insert>
+
+</mapper>

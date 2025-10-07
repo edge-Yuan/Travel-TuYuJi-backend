@@ -32,7 +32,7 @@ public class ItineraryManagementController {
     @GetMapping("/list")
     @ApiOperation("获取用户行程列表")
     public Result<Page<ItineraryListVO>> getUserItineraries(
-            @ApiParam("用户ID") @RequestParam(defaultValue = "1") Long userId,
+            @ApiParam("用户ID") @RequestParam(defaultValue = "10003") Long userId,
             @ApiParam("状态筛选：all-全部，upcoming-待出行，completed-已完成，cancelled-已取消") 
             @RequestParam(defaultValue = "all") String status,
             @ApiParam("页码") @RequestParam(defaultValue = "1") Integer page,
@@ -162,6 +162,21 @@ public class ItineraryManagementController {
         } catch (Exception e) {
             log.error("检查是否可以取消行程失败", e);
             return Result.error("检查失败：" + e.getMessage());
+        }
+    }
+
+    @PostMapping("/sync/{orderId}")
+    @ApiOperation("同步订单到行程记录")
+    public Result<String> syncItineraryFromOrder(@ApiParam("订单ID") @PathVariable Long orderId) {
+        
+        log.info("同步订单到行程记录，订单ID：{}", orderId);
+        
+        try {
+            itineraryManagementService.syncItineraryFromOrder(orderId);
+            return Result.success("同步成功");
+        } catch (Exception e) {
+            log.error("同步订单到行程记录失败", e);
+            return Result.error("同步失败：" + e.getMessage());
         }
     }
 }

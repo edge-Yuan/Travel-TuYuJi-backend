@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wanderlust.travel.travelportal.mapper.EvaluationUsefulMapper">
+
+    <!-- 根据评价ID和用户ID查询有用记录 -->
+    <select id="selectByEvalIdAndUserId" resultType="com.wanderlust.travel.travelportal.entity.EvaluationUseful">
+        SELECT * FROM evaluation_useful 
+        WHERE eval_id = #{evalId} AND user_id = #{userId}
+    </select>
+
+    <!-- 根据评价ID统计有用数量 -->
+    <select id="countByEvalId" resultType="int">
+        SELECT COUNT(*) FROM evaluation_useful 
+        WHERE eval_id = #{evalId} AND status = 1
+    </select>
+
+    <!-- 根据评价ID获取有用用户列表（分页） -->
+    <select id="selectUsefulUsersByEvalId" resultType="com.wanderlust.travel.travelportal.entity.EvaluationUseful">
+        SELECT * FROM evaluation_useful 
+        WHERE eval_id = #{evalId} AND status = 1
+        ORDER BY useful_time DESC
+    </select>
+
+</mapper>
